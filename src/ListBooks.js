@@ -1,9 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-//import { Link } from 'react-router-dom'
-
 export default class ListBooks extends Component {
-  static PropTypes = {
+  static propTypes = {
     books: PropTypes.array.isRequired,
   }
   render(){
@@ -19,8 +17,7 @@ export default class ListBooks extends Component {
                 <div className="book-cover" style={{ width: 128, height: 192, backgroundImage: `url(${book.imageLinks.thumbnail})`}}></div>
                 <div className="book-shelf-changer">
                   <select>
-                    {console.log(book.shelf)}
-                    <option value="move" disabled>Move to...</option>                    
+                    <option value="move" disabled>Move to...</option>
                     <option value="currentlyReading">Currently Reading</option>
                     <option value="wantToRead">Want to Read</option>
                     <option value="read">Read</option>

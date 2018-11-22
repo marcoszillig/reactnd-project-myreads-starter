@@ -3,20 +3,24 @@ import * as BooksAPI from './BooksAPI'
 import { Route, Link } from 'react-router-dom'
 import './App.css'
 import ListBooks from './ListBooks'
-import AddBook from './AddBook'
+import SearchBook from './SearchBook'
 
 class BooksApp extends React.Component {
-  state = {
-    /**
-     * TODO: Instead of using this state variable to keep track of which page
-     * we're on, use the URL in the browser's address bar. This will ensure that
-     * users can use the browser's back and forward buttons to navigate between
-     * pages, as well as provide a good URL they can bookmark and share.
-     */
-    // showSearchPage: false
+  state = {  
     books: [],
-    shelf: ''
+    read: [],
+    wantToRead: [],
+    currentlyReading: [],
+    filteredList: [],
+    query: ''
   }
+
+// E quando você retornar os livros, você filtra eles e coloca em cada local apropriado:
+// this.setState(prevState => ({
+//   read: books.filter(book => book.shelf === 'read'),
+//   wantToRead: books.filter(book => book.shelf === 'wantToRead'),
+//   currentlyReading: books.filter(book => book.shelf === 'currentlyReading')
+// }))
   componentDidMount() {
     BooksAPI.getAll()
     .then((books) => {
@@ -25,20 +29,42 @@ class BooksApp extends React.Component {
       }))
     })
   }
+
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      filteredList:nextProps.books.filter(book => book.title.startsWith(nextProps.query))
+    })
+  }
+
+  onSearch = (e) => {
+    this.setState({
+      query:e.target.value,
+      filteredList:this.state.books.filter(book => book.title.toLowerCase().startsWith(e.target.value.toLowerCase()))
+    })
+  }
   render() {
+    const { filteredList } = this.state
+    const { query } = this.state
+    
     return (
       <div className="app">
-        <div className="list-books">
-          <div className="list-books-title">
-            <h1>MyReads</h1>
-          </div>
           <Route exact path='/' render={() => (
-            <ListBooks 
-              books={this.state.books}
-            />
+            <div className="list-books">
+              <div className="list-books-title">
+                <h1>MyReads</h1>
+              </div>
+              <ListBooks 
+                books={filteredList}
+              />
+            </div>
           )} />
-        </div>
-        <Route path='/search' rendercomponent={AddBook}/>
+        <Route path='/search' render={() => (
+          <SearchBook
+            books={filteredList}
+            onSearch={this.onSearch}
+            query={this.state.query}
+          />
+        )} />  
         <div className="open-search">
           <Link
           to='/search'
